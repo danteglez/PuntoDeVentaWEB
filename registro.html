@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Punto de Venta - Registro</title>
+    <link rel="stylesheet" href="style.css">
+
+    <!-- Incluir SDK de Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@1.35.5/dist/umd/supabase.min.js"></script>
+</head>
+<body>
+    <div class="Formulario">
+        <h1>Registro</h1>
+
+        <!-- Formulario de registro -->
+        <form id="register-form">
+            <div class="username">
+                <input type="text" id="username-register" required>
+                <label>Nombre de usuario</label>
+            </div>
+            <div class="contrasena">
+                <input type="password" id="password-register" required>
+                <label>Contraseña</label>
+            </div>
+            <div class="contrasena">
+                <input type="password" id="confirm-password" required>
+                <label>Confirmar Contraseña</label>
+            </div>
+            <div class="recordar">
+                <input type="submit" value="Registrar">
+            </div>
+            <div class="registrarse">
+                <span>¿Ya tienes cuenta? <a href="login.html">Inicia sesión</a></span>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        // Configura Supabase
+        const supabaseUrl = 'https://dsdkzeclqsjjyszmchsq.supabase.co'; // Reemplaza con tu URL de Supabase
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRzZGt6ZWNscXNqanlzem1jaHNxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDI0MzkwODcsImV4cCI6MjA1ODAxNTA4N30.pgSGC5MjLFYzUd6Y80IGWycBPV1PSQWMp0y37lFPXmQ'; // Reemplaza con tu clave pública
+        const supabase = supabase.createClient(supabaseUrl, supabaseKey);
+
+        // Manejar el evento de registro
+        document.getElementById('register-form').addEventListener('submit', async (event) => {
+            event.preventDefault();
+
+            // Obtener valores del formulario
+            const username = document.getElementById('username-register').value;
+            const password = document.getElementById('password-register').value;
+            const confirmPassword = document.getElementById('confirm-password').value;
+
+            // Verificar que las contraseñas coinciden
+            if (password !== confirmPassword) {
+                alert("Las contraseñas no coinciden");
+                return;
+            }
+
+            // Insertar el nuevo usuario en la base de datos
+            const { data, error } = await supabase
+                .from('usuarios')  // Asegúrate de que tu tabla se llame "usuarios"
+                .insert([{ user: username, password: password }]);
+
+            // Manejo de errores
+            if (error) {
+                alert('Error en el registro: ' + error.message);
+            } else {
+                alert('Registro exitoso');
+                console.log('Usuario registrado:', data);
+                // Redirigir al inicio de sesión después del registro
+                window.location.href = "login.html"; // Redirigir a la página de login
+            }
+        });
+    </script>
+</body>
+</html>
