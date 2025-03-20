@@ -1,46 +1,30 @@
 <!DOCTYPE html>
 <html lang="es">
-<head>
+  <head>
     <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Punto de Venta</title>
-    <link rel="stylesheet" href="styles.css">
-</head>
-<body>
-    <header>
-        <h1>Punto de Venta</h1>
-    </header>
-    
-    <div class="container">
-        <div class="product-list">
-            <h2>Productos Disponibles</h2>
-            <div class="product" data-id="1">
-                <h3>Producto 1</h3>
-                <p>$10.00</p>
-                <button onclick="addToCart(1, 'Producto 1', 10.00)">Añadir al carrito</button>
-            </div>
-            <div class="product" data-id="2">
-                <h3>Producto 2</h3>
-                <p>$20.00</p>
-                <button onclick="addToCart(2, 'Producto 2', 20.00)">Añadir al carrito</button>
-            </div>
-            <div class="product" data-id="3">
-                <h3>Producto 3</h3>
-                <p>$30.00</p>
-                <button onclick="addToCart(3, 'Producto 3', 30.00)">Añadir al carrito</button>
-            </div>
+    <title>Document</title>
+    <link rel="stylesheet" href="style.css">
+  </head>
+  <body>
+    <div class="formulario">
+      <h1>Inicio de sesión</h1>
+      <form method="post">
+        <div class="username">
+          <input type="text" required>
+          <label>Nombre de usuario</label>
         </div>
-
-        <div class="cart">
-            <h2>Carrito de Compras</h2>
-            <ul id="cart-items">
-                <!-- Aquí se agregarán los productos -->
-            </ul>
-            <p id="total">Total: $0.00</p>
-            <button onclick="checkout()">Realizar Pago</button>
+        <div class="contraseña">
+          <input type="password" required>
+          <label>Contraseña</label>
         </div>
+        <div class="recordar">¿Olvidó su contraseña?</div>
+        <input type="submit" value="Iniciar">
+        <div class="registrarse">
+          Quiero hacer el <a href="#">registro</a>
+        </div>
+      </form>
     </div>
-
-    <script src="script.js"></script>
-</body>
+  </body>
 </html>
