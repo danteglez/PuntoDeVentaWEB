@@ -39,6 +39,7 @@
 
     <script>
         // Configura Supabase con la URL y clave pública
+        import { createClient } from '@supabase/supabase-js'
         const supabaseUrl = 'https://dsdkzeclqsjjyszmchsq.supabase.co'; // Reemplaza con tu URL de Supabase
         const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRzZGt6ZWNscXNqanlzem1jaHNxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDI0MzkwODcsImV4cCI6MjA1ODAxNTA4N30.pgSGC5MjLFYzUd6Y80IGWycBPV1PSQWMp0y37lFPXmQ'; // Reemplaza con tu clave pública
         const supabase = supabase.createClient(supabaseUrl, supabaseKey);
