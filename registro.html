@@ -29,26 +29,26 @@
                 <label>Confirmar Contraseña</label>
             </div>
             <div class="recordar">
+                <!-- Este es el botón de enviar, sin "onclick" para que se ejecute con el submit del formulario -->
                 <input type="submit" value="Registrar">
             </div>
             <div class="registrarse">
-                <span>¿Ya tienes cuenta? <a href="index.html">Inicia sesión</a></span>
+                <span>¿Ya tienes cuenta? <a href="login.html">Inicia sesión</a></span>
             </div>
         </form>
     </div>
 
     <script>
-        // Configura Supabase con la URL y clave pública
-        import { createClient } from '@supabase/supabase-js'
-        const supabaseUrl = 'https://dsdkzeclqsjjyszmchsq.supabase.co'; // Reemplaza con tu URL de Supabase
-        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRzZGt6ZWNscXNqanlzem1jaHNxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDI0MzkwODcsImV4cCI6MjA1ODAxNTA4N30.pgSGC5MjLFYzUd6Y80IGWycBPV1PSQWMp0y37lFPXmQ'; // Reemplaza con tu clave pública
+        // Configura Supabase
+        const supabaseUrl = 'https://dsdkzeclqsjjyszmchsq.supabase.co';  // URL de tu proyecto de Supabase
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRzZGt6ZWNscXNqanlzem1jaHNxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDI0MzkwODcsImV4cCI6MjA1ODAxNTA4N30.pgSGC5MjLFYzUd6Y80IGWycBPV1PSQWMp0y37lFPXmQ';  // Reemplaza con tu clave pública
+
         const supabase = supabase.createClient(supabaseUrl, supabaseKey);
 
-        // Manejar el evento de registro
+        // Manejar el evento de registro (submit)
         document.getElementById('register-form').addEventListener('submit', async (event) => {
-            event.preventDefault();
+            event.preventDefault();  // Prevenir la acción por defecto del formulario
 
-            // Obtener valores del formulario
             const username = document.getElementById('username-register').value;
             const password = document.getElementById('password-register').value;
             const confirmPassword = document.getElementById('confirm-password').value;
@@ -62,10 +62,9 @@
             try {
                 // Insertar el nuevo usuario en la base de datos
                 const { data, error } = await supabase
-                    .from('usuarios')  // Asegúrate de que tu tabla se llame "usuarios"
+                    .from('usuarios')  // Asegúrate de que la tabla se llame "usuarios"
                     .insert([{ user: username, password: password }]);
 
-                // Verificar si hubo un error
                 if (error) {
                     console.error('Error en el registro:', error.message);
                     alert('Error al registrar el usuario: ' + error.message);
@@ -73,7 +72,7 @@
                     alert('Registro exitoso');
                     console.log('Usuario registrado:', data);
                     // Redirigir al inicio de sesión después del registro
-                    window.location.href = "index.html"; // Redirigir a la página de login
+                    window.location.href = "login.html"; // Redirigir a la página de login
                 }
             } catch (error) {
                 console.error('Error al intentar registrar:', error);
