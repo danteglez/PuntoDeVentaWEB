@@ -13,21 +13,22 @@
 <body>
     <div class="Formulario">
         <h1>Inicio de sesión</h1>
+
+        <!-- Formulario de inicio de sesión -->
         <form id="login-form">
             <div class="username">
-                <input type="text" id="username" required>
+                <input type="text" id="username-login" required>
                 <label>Nombre de usuario</label>
             </div>
             <div class="contrasena">
-                <input type="password" id="password" required>
+                <input type="password" id="password-login" required>
                 <label>Contraseña</label>
             </div>
             <div class="recordar">
-                <label>¿Olvidó su contraseña?</label>
                 <input type="submit" value="Iniciar sesión">
             </div>
             <div class="registrarse">
-                Quiero hacer el <a href="#">registro</a>
+                <span id="toggle-to-register">¿No tienes cuenta? <a href="registro.html">Regístrate</a></span>
             </div>
         </form>
     </div>
@@ -43,14 +44,16 @@
             event.preventDefault();
 
             // Obtener valores del formulario
-            const username = document.getElementById('username').value;
-            const password = document.getElementById('password').value;
+            const username = document.getElementById('username-login').value;
+            const password = document.getElementById('password-login').value;
 
-            // Intentar iniciar sesión con Supabase
-            const { data, error } = await supabase.auth.signInWithPassword({
-                email: username, // Usamos el email como nombre de usuario
-                password: password,
-            });
+            // Consultar la base de datos para verificar las credenciales
+            const { data, error } = await supabase
+                .from('usuarios')  // Asegúrate de que tu tabla se llame "usuarios"
+                .select('*')
+                .eq('user', username)
+                .eq('password', password)
+                .single();  // Devuelve un solo registro
 
             // Manejo de errores
             if (error) {
