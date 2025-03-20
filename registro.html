@@ -5,13 +5,13 @@
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Inicio de sesión</title>
+  <title>Registro</title>
   <link rel="stylesheet" href="style.css">
   <!-- Firebase SDK -->
   <script type="module">
     // Importar las funciones necesarias de Firebase SDK
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-app.js";
-    import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-auth.js";
+    import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-auth.js";
     import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-analytics.js";
 
     // Configuración de Firebase
@@ -35,49 +35,48 @@
 
 <body>
   <div class="formulario">
-    <!-- Formulario de inicio de sesión -->
-    <h1>Inicio de sesión</h1>
-    <form id="loginForm">
+    <!-- Formulario de registro -->
+    <h1>Registro</h1>
+    <form id="registerForm">
       <div class="username">
-        <input type="email" id="email" required />
+        <input type="email" id="registerEmail" required />
         <label>Correo electrónico</label>
       </div>
       <div class="contraseña">
-        <input type="password" id="password" required />
+        <input type="password" id="registerPassword" required />
         <label>Contraseña</label>
       </div>
-      <div class="recordar">¿Olvidó su contraseña?</div>
-      <input type="submit" value="Iniciar sesión" />
+      <input type="submit" value="Registrar" />
       <div class="registrarse">
-        ¿No tienes cuenta? <a href="registro.html">Registrarse</a>
+        ¿Ya tienes cuenta? <a href="index.html">Iniciar sesión</a>
       </div>
     </form>
   </div>
 
   <script type="module">
-    // Manejar el evento submit del formulario de inicio de sesión
-    document.getElementById("loginForm").addEventListener("submit", async function (e) {
+    // Manejar el evento submit del formulario de registro
+    document.getElementById("registerForm").addEventListener("submit", async function (e) {
       e.preventDefault(); // Evita que el formulario se envíe de manera tradicional
 
       // Obtener los valores de los campos de entrada
-      const email = document.getElementById("email").value;
-      const password = document.getElementById("password").value;
+      const email = document.getElementById("registerEmail").value;
+      const password = document.getElementById("registerPassword").value;
 
-      // Intentar iniciar sesión con Firebase Auth
+      // Intentar crear un nuevo usuario en Firebase
       try {
-        const userCredential = await signInWithEmailAndPassword(auth, email, password);
+        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
         const user = userCredential.user;
-        console.log("Usuario autenticado: ", user);
-        alert("Inicio de sesión exitoso");
+        console.log("Usuario registrado: ", user);
+        alert("Registro exitoso");
 
-        // Redirigir a otra página o realizar una acción adicional
-        window.location.href = "pagina-principal.html"; // Cambia a la URL de la página principal
+        // Redirigir a la página de inicio de sesión después del registro
+        window.location.href = "index.html"; // Redirige a la página de inicio de sesión
 
       } catch (error) {
         const errorCode = error.code;
         const errorMessage = error.message;
-        console.error("Error al iniciar sesión:", errorCode, errorMessage);
-        alert("Error al iniciar sesión. Verifica tus credenciales.");
+        console.error("Error al registrar usuario:", errorCode, errorMessage);
+        alert("Error al registrar usuario. Verifica los datos.");
       }
     });
   </script>
