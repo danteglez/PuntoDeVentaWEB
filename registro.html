@@ -62,7 +62,7 @@
                 // Insertar el nuevo usuario en la base de datos
                 const { data, error } = await supabase
                     .from('usuarios')  // Asegúrate de que tu tabla se llame "usuarios"
-                    .insert([{ user: username, password: password }]);
+                    .insert([{ user: username},{ password: password }]);
 
                 // Verificar si hubo un error
                 if (error) {
