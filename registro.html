@@ -32,15 +32,15 @@
                 <input type="submit" value="Registrar">
             </div>
             <div class="registrarse">
-                <span>¿Ya tienes cuenta? <a href="index.html">Inicia sesión</a></span>
+                <span>¿Ya tienes cuenta? <a href="login.html">Inicia sesión</a></span>
             </div>
         </form>
     </div>
 
     <script>
         // Configura Supabase
-        const supabaseUrl = 'https://dsdkzeclqsjjyszmchsq.supabase.co'; // Reemplaza con tu URL de Supabase
-        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRzZGt6ZWNscXNqanlzem1jaHNxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDI0MzkwODcsImV4cCI6MjA1ODAxNTA4N30.pgSGC5MjLFYzUd6Y80IGWycBPV1PSQWMp0y37lFPXmQ'; // Reemplaza con tu clave pública
+        const supabaseUrl = 'https://xyzcompany.supabase.co'; // Reemplaza con tu URL de Supabase
+        const supabaseKey = 'your-anon-public-key'; // Reemplaza con tu clave pública
         const supabase = supabase.createClient(supabaseUrl, supabaseKey);
 
         // Manejar el evento de registro
@@ -58,19 +58,25 @@
                 return;
             }
 
-            // Insertar el nuevo usuario en la base de datos
-            const { data, error } = await supabase
-                .from('usuarios')  // Asegúrate de que tu tabla se llame "usuarios"
-                .insert([{ user: username, password: password }]);
+            try {
+                // Insertar el nuevo usuario en la base de datos
+                const { data, error } = await supabase
+                    .from('usuarios')  // Asegúrate de que tu tabla se llame "usuarios"
+                    .insert([{ user: username, password: password }]);
 
-            // Manejo de errores
-            if (error) {
-                alert('Error en el registro: ' + error.message);
-            } else {
-                alert('Registro exitoso');
-                console.log('Usuario registrado:', data);
-                // Redirigir al inicio de sesión después del registro
-                window.location.href = "login.html"; // Redirigir a la página de login
+                // Verificar si hubo un error
+                if (error) {
+                    console.error('Error en el registro:', error.message);
+                    alert('Error al registrar el usuario: ' + error.message);
+                } else {
+                    alert('Registro exitoso');
+                    console.log('Usuario registrado:', data);
+                    // Redirigir al inicio de sesión después del registro
+                    window.location.href = "login.html"; // Redirigir a la página de login
+                }
+            } catch (error) {
+                console.error('Error al intentar registrar:', error);
+                alert('Hubo un error al intentar registrar el usuario. Intenta de nuevo.');
             }
         });
     </script>
