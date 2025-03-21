@@ -46,7 +46,7 @@ def login():
                 st.session_state["authenticated"] = True
                 st.session_state["username"] = username
                 st.success("Inicio de sesión exitoso")
-                st.experimental_rerun()
+                st.rerun()
             else:
                 st.error("Usuario o contraseña incorrectos")
 
