@@ -75,7 +75,7 @@ def eliminar_producto():
                 cur.close()
                 conn.close()
                 st.success(f"Producto '{product_codes[selected_code]}' eliminado exitosamente")
-                st.experimental_rerun()
+                st.rerun()
 
 def add_to_cart(code):
     if CART_KEY not in st.session_state:
