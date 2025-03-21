@@ -75,7 +75,7 @@ def register():
 def logout():
     st.session_state["authenticated"] = False
     st.session_state["username"] = ""
-    st.experimental_rerun()
+    st.rerun()
 
 def main():
     setup_database()
