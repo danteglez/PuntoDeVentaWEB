@@ -3,7 +3,7 @@ import psycopg2
 import pandas as pd
 
 # Conexión a Supabase PostgreSQL con la URL
-DB_URL = "postgresql://postgres:Dokiringuillas1@db.mbidkiuthyjlvwqnsdpl.supabase.co:5432/postgres"
+DB_URL = "postgresql://postgres.mbidkiuthyjlvwqnsdpl:Dokiringuillas1@aws-0-us-west-1.pooler.supabase.com:6543/postgres"
 CART_KEY = "carrito"
 
 def connect_db():
