@@ -9,7 +9,7 @@ def obtener_monto_caja():
         resultado = cur.fetchone()
         cur.close()
         conn.close()
-        return resultado[0] if resultado else 0.0
+        return float(resultado[0]) if resultado else 0.0
     return 0.0
 
 def actualizar_monto_caja(nuevo_monto):
@@ -26,7 +26,8 @@ def caja():
     st.title("Caja - Dinero Físico")
 
     monto_actual = obtener_monto_caja()
-    nuevo_monto = st.number_input("Dinero actual en caja:", min_value=0.0, value=monto_actual, format="%.2f")
+    monto_float = float(monto_actual)
+    nuevo_monto = st.number_input("Dinero actual en caja:", min_value=0.0, value=monto_float, format="%.2f")
 
     if st.button("Actualizar Monto en Caja"):
         actualizar_monto_caja(nuevo_monto)
