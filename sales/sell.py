@@ -3,11 +3,20 @@ from auth.db import connect_db
 from sales.cart import add_to_cart, display_cart
 from datetime import datetime
 
-def registrar_venta_en_db():
+def actualizar_caja_con_venta(monto):
+    conn = connect_db()
+    if conn:
+        cur = conn.cursor()
+        cur.execute("UPDATE caja SET monto = monto + %s WHERE id = (SELECT id FROM caja ORDER BY id LIMIT 1)", (monto,))
+        conn.commit()
+        cur.close()
+        conn.close()
+
+def registrar_venta_en_db(total):
     carrito = st.session_state.get("carrito", [])
     if not carrito:
         st.warning("El carrito está vacío. No se puede registrar la venta.")
-        return
+        return False
 
     conn = connect_db()
     if conn:
@@ -20,8 +29,8 @@ def registrar_venta_en_db():
         conn.commit()
         cur.close()
         conn.close()
-        st.success("Venta registrada exitosamente.")
-        st.session_state["carrito"] = []
+        return True
+    return False
 
 def venta():
     st.subheader("Buscar Producto para Venta")
@@ -47,5 +56,19 @@ def venta():
 
     display_cart()
 
-    if st.button("Confirmar Venta"):
-        registrar_venta_en_db()
+    carrito = st.session_state.get("carrito", [])
+    total = sum(item["venta"] for item in carrito)
+
+    if carrito:
+        pago = st.number_input("¿Con cuánto te pagan?", min_value=0.0, format="%.2f")
+
+        if st.button("Confirmar Venta"):
+            if pago < total:
+                st.error("El pago es menor al total. Verifica el monto.")
+                return
+            
+            cambio = pago - total
+            if registrar_venta_en_db(total):
+                actualizar_caja_con_venta(pago)
+                st.success(f"Venta registrada. Cambio a entregar: ${cambio:.2f}")
+                st.session_state["carrito"] = []
