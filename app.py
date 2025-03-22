@@ -1,10 +1,10 @@
 import streamlit as st
-import main  # Este contiene la lógica del punto de venta
-from login import setup_database, login, register, logout
+from auth.login import login
+from auth.register import register
+from auth.logout import logout
+import main
 
 def app():
-    setup_database()
-    
     if "authenticated" not in st.session_state:
         st.session_state["authenticated"] = False
 
