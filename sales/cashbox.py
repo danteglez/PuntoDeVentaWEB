@@ -1,23 +1,68 @@
 import streamlit as st
+from auth.db import connect_db
+from sales.cart import add_to_cart, display_cart
+from datetime import datetime
 
-ventas_simuladas = [
-    {"fecha": "2025-03-22", "monto": 100.0},
-    {"fecha": "2025-03-22", "monto": 55.5},
-    {"fecha": "2025-03-21", "monto": 200.0}
-]
+CAJA_KEY = "dinero_en_caja"
 
-def caja():
-    st.title("Caja - Control de Dinero")
+def registrar_venta_en_db():
+    carrito = st.session_state.get("carrito", [])
+    if not carrito:
+        st.warning("El carrito está vacío. No se puede registrar la venta.")
+        return False, 0.0
 
-    total_dia = sum(venta["monto"] for venta in ventas_simuladas if venta["fecha"] == "2025-03-22")
-    total_general = sum(venta["monto"] for venta in ventas_simuladas)
+    total = sum(item["venta"] for item in carrito)
+    conn = connect_db()
+    if conn:
+        cur = conn.cursor()
+        for item in carrito:
+            cur.execute(
+                "INSERT INTO ventas (codigo_producto, nombre_producto, precio_venta, cantidad, fecha) VALUES (%s, %s, %s, %s, %s)",
+                (item["codigo"], item["nombre"], item["venta"], 1, datetime.now())
+            )
+        conn.commit()
+        cur.close()
+        conn.close()
+        return True, total
+    return False, 0.0
 
-    st.subheader("Resumen de Ventas")
-    st.write(f"Ventas del día: ${total_dia:.2f}")
-    st.write(f"Ventas totales registradas: ${total_general:.2f}")
+def venta():
+    st.subheader("Buscar Producto para Venta")
+    search_query = st.text_input("Buscar producto por nombre o código:")
+    conn = connect_db()
+    if conn:
+        cur = conn.cursor()
+        cur.execute("SELECT codigo, nombre, venta FROM productos WHERE nombre ILIKE %s OR codigo ILIKE %s", 
+                    (f"%{search_query}%", f"%{search_query}%"))
+        found_products = cur.fetchall()
+        cur.close()
+        conn.close()
+        if found_products:
+            for code, name, price in found_products:
+                col1, col2 = st.columns([3, 1])
+                with col1:
+                    st.write(f"**Código:** {code} - **Nombre:** {name} - **Precio Venta:** ${price:.2f}")
+                with col2:
+                    if st.button("Agregar", key=code):
+                        add_to_cart(code)
+        else:
+            st.warning("Producto no encontrado")
 
-    st.subheader("Historial de Ventas")
-    for venta in ventas_simuladas:
-        st.write(f"Fecha: {venta['fecha']} - Monto: ${venta['monto']:.2f}")
+    display_cart()
 
-    st.info("Este es un ejemplo. Puedes conectar esta sección con tu base de datos de ventas para que sea dinámica.")
+    if st.button("Confirmar Venta"):
+        exito, total = registrar_venta_en_db()
+        if exito:
+            pago = st.number_input("¿Con cuánto te pagan?", min_value=0.0, format="%.2f")
+            if pago >= total:
+                cambio = pago - total
+                st.success(f"Cambio a entregar: ${cambio:.2f}")
+
+                # Actualiza caja automáticamente
+                if CAJA_KEY not in st.session_state:
+                    st.session_state[CAJA_KEY] = 0.0
+                st.session_state[CAJA_KEY] += total
+
+                st.session_state["carrito"] = []
+            else:
+                st.error("El pago es menor al total. Verifica el monto.")
