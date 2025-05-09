@@ -3,9 +3,9 @@ import psycopg2
 import pandas as pd
 import qrcode
 import os
-from streamlit_webrtc import webrtc_streamer
-import av
 import cv2
+import numpy as np
+from PIL import Image
 
 DB_URL = "postgresql://postgres.mbidkiuthyjlvwqnsdpl:Dokiringuillas1@aws-0-us-west-1.pooler.supabase.com:6543/postgres"
 CART_KEY = "carrito"
@@ -111,24 +111,11 @@ def display_cart():
         st.write(f"{idx+1}. {item['nombre']} - ${item['venta']:.2f}")
     st.write(f"**Total:** ${total:.2f}")
 
-# Clase del escáner QR con OpenCV
-class QRScanner:
-    def __init__(self):
-        self.last_result = None
-
-    def video_frame_callback(self, frame):
-        img = frame.to_ndarray(format="bgr24")
-        detector = cv2.QRCodeDetector()
-        data, bbox, _ = detector.detectAndDecode(img)
-        if data:
-            self.last_result = data
-            cv2.putText(img, f"QR: {data}", (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0,255,0), 2)
-        return av.VideoFrame.from_ndarray(img, format="bgr24")
-
-    def run(self):
-        webrtc_streamer(key="venta_qr", video_frame_callback=self.video_frame_callback)
-        if self.last_result:
-            add_to_cart(self.last_result)
+def escanear_qr_desde_imagen(img):
+    detector = cv2.QRCodeDetector()
+    img_cv = cv2.cvtColor(np.array(img), cv2.COLOR_RGB2BGR)
+    data, bbox, _ = detector.detectAndDecode(img_cv)
+    return data if data else None
 
 def venta():
     st.subheader("Buscar Producto manualmente")
@@ -150,9 +137,17 @@ def venta():
                     add_to_cart(code)
 
     st.markdown("---")
-    st.subheader("Escanear Código QR")
-    scanner = QRScanner()
-    scanner.run()
+    st.subheader("Escanear Código QR desde Foto")
+    foto = st.camera_input("Tomar o subir una imagen")
+
+    if foto is not None:
+        img = Image.open(foto)
+        codigo = escanear_qr_desde_imagen(img)
+        if codigo:
+            st.success(f"QR detectado: {codigo}")
+            add_to_cart(codigo)
+        else:
+            st.error("No se detectó ningún QR")
 
     display_cart()
 
