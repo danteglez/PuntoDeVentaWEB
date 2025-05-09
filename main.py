@@ -54,7 +54,15 @@ def ver_productos():
         df = pd.read_sql("SELECT * FROM productos", conn)
         conn.close()
         if not df.empty:
-            st.dataframe(df)
+            for _, row in df.iterrows():
+                with st.expander(f"{row['nombre']} (Código: {row['codigo']})"):
+                    st.write(f"Costo: ${row['costo']:.2f}")
+                    st.write(f"Precio de venta: ${row['venta']:.2f}")
+                    qr_path = f"qrs/{row['codigo']}.png"
+                    if os.path.exists(qr_path):
+                        st.image(qr_path, caption="QR del producto", width=150)
+                    else:
+                        st.warning("QR no disponible")
         else:
             st.warning("No hay productos disponibles")
 
