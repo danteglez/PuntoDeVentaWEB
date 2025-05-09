@@ -5,7 +5,6 @@ import qrcode
 import os
 from streamlit_webrtc import webrtc_streamer
 import av
-from pyzbar.pyzbar import decode
 import cv2
 
 DB_URL = "postgresql://postgres.mbidkiuthyjlvwqnsdpl:Dokiringuillas1@aws-0-us-west-1.pooler.supabase.com:6543/postgres"
@@ -21,7 +20,7 @@ def connect_db():
 
 def generar_qr_producto(codigo, nombre):
     os.makedirs("qrs", exist_ok=True)
-    data = f"{codigo}"  # Solo código, puede ser URL si quieres
+    data = f"{codigo}"
     qr = qrcode.make(data)
     qr.save(f"qrs/{codigo}.png")
 
@@ -136,21 +135,18 @@ def venta():
             st.warning("Producto no encontrado")
     display_cart()
 
-# CLASE PARA ESCANEO DE QR
+# Escáner con OpenCV QRCodeDetector
 class QRScanner:
     def __init__(self):
         self.last_result = None
 
     def video_frame_callback(self, frame):
         img = frame.to_ndarray(format="bgr24")
-        decoded_objs = decode(img)
-        for obj in decoded_objs:
-            self.last_result = obj.data.decode("utf-8")
-            points = obj.polygon
-            if len(points) > 1:
-                pts = [(p.x, p.y) for p in points]
-                for i in range(len(pts)):
-                    cv2.line(img, pts[i], pts[(i + 1) % len(pts)], (0, 255, 0), 2)
+        detector = cv2.QRCodeDetector()
+        data, bbox, _ = detector.detectAndDecode(img)
+        if data:
+            self.last_result = data
+            cv2.putText(img, f"QR: {data}", (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0,255,0), 2)
         return av.VideoFrame.from_ndarray(img, format="bgr24")
 
     def run(self):

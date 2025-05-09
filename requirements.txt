@@ -1,5 +1,6 @@
-psycopg2-binary
-qrcode
-opencv-python-headless
-pyzbar
+streamlit
 streamlit-webrtc
+psycopg2-binary
+opencv-python-headless
+qrcode
+pandas
