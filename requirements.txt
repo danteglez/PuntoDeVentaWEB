@@ -1,6 +1,6 @@
 streamlit
-streamlit-webrtc
 psycopg2-binary
-opencv-python-headless
 qrcode
+opencv-python-headless
+streamlit-webrtc
 pandas
