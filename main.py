@@ -6,6 +6,7 @@ import os
 import cv2
 import numpy as np
 from PIL import Image
+import io
 
 DB_URL = "postgresql://postgres.mbidkiuthyjlvwqnsdpl:Dokiringuillas1@aws-0-us-west-1.pooler.supabase.com:6543/postgres"
 CART_KEY = "carrito"
@@ -17,10 +18,11 @@ def connect_db():
         st.error(f"Error de conexión: {e}")
         return None
 
-def generar_qr_producto(codigo):
-    os.makedirs("qrs", exist_ok=True)
+def generar_qr_bytes(codigo):
     qr = qrcode.make(codigo)
-    qr.save(f"qrs/{codigo}.png")
+    buffer = io.BytesIO()
+    qr.save(buffer, format="PNG")
+    return buffer.getvalue()
 
 def ingresar_producto():
     st.title("Ingresar Producto")
@@ -38,12 +40,12 @@ def ingresar_producto():
                 if cur.fetchone():
                     st.error("El código del producto ya existe")
                 else:
-                    cur.execute("INSERT INTO productos (codigo, nombre, costo, venta) VALUES (%s, %s, %s, %s)",
-                                (new_code, new_name, new_cost, new_price))
+                    qr_bytes = generar_qr_bytes(new_code)
+                    cur.execute("INSERT INTO productos (codigo, nombre, costo, venta, qr) VALUES (%s, %s, %s, %s, %s)",
+                                (new_code, new_name, new_cost, new_price, psycopg2.Binary(qr_bytes)))
                     conn.commit()
-                    generar_qr_producto(new_code)
                     st.success("Producto guardado exitosamente")
-                    st.image(f"qrs/{new_code}.png", caption="Código QR generado")
+                    st.image(qr_bytes, caption="Código QR generado")
                 cur.close()
                 conn.close()
 
@@ -58,9 +60,8 @@ def ver_productos():
                 with st.expander(f"{row['nombre']} (Código: {row['codigo']})"):
                     st.write(f"Costo: ${row['costo']:.2f}")
                     st.write(f"Precio de venta: ${row['venta']:.2f}")
-                    qr_path = f"qrs/{row['codigo']}.png"
-                    if os.path.exists(qr_path):
-                        st.image(qr_path, caption="QR del producto", width=150)
+                    if row.get("qr"):
+                        st.image(row["qr"], caption="QR del producto", width=150)
                     else:
                         st.warning("QR no disponible")
         else:
