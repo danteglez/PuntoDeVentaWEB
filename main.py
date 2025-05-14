@@ -61,7 +61,8 @@ def ver_productos():
                     st.write(f"Costo: ${row['costo']:.2f}")
                     st.write(f"Precio de venta: ${row['venta']:.2f}")
                     if row.get("qr"):
-                        st.image(row["qr"], caption="QR del producto", width=150)
+                        qr_bytes = bytes(row["qr"])
+                        st.image(qr_bytes, caption="QR del producto", width=150)
                     else:
                         st.warning("QR no disponible")
         else:
