@@ -121,7 +121,7 @@ def display_cart():
         st.info("No hay productos en el carrito")
         return
 
-    total = sum(item["venta"] for item in carrito)
+    total = sum(float(item["venta"]) for item in carrito)
     for idx, item in enumerate(carrito):
         st.write(f"{idx+1}. {item['nombre']} - ${item['venta']:.2f}")
     st.write(f"**Total a pagar:** ${total:.2f}")
@@ -129,13 +129,16 @@ def display_cart():
     monto_recibido = st.number_input("Monto recibido del cliente:", min_value=0.0, format="%.2f")
 
     if st.button("Cobrar"):
-        if monto_recibido < total:
-            st.error("El monto recibido es insuficiente")
-        else:
-            cambio = monto_recibido - total
-            st.success(f"Compra realizada. Total pagado: ${total:.2f}")
-            st.success(f"Cambio a entregar: ${cambio:.2f}")
-            st.session_state[CART_KEY] = []
+        try:
+            if monto_recibido < total:
+                st.error("El monto recibido es insuficiente")
+            else:
+                cambio = monto_recibido - total
+                st.success(f"Compra realizada. Total pagado: ${total:.2f}")
+                st.success(f"Cambio a entregar: ${cambio:.2f}")
+                st.session_state[CART_KEY] = []
+        except Exception as e:
+            st.error(f"Ocurrió un error al calcular el cambio: {e}")
 
 def escanear_qr_desde_imagen(img):
     detector = cv2.QRCodeDetector()
