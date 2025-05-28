@@ -61,8 +61,12 @@ def ver_productos():
                     st.write(f"Costo: ${row['costo']:.2f}")
                     st.write(f"Precio de venta: ${row['venta']:.2f}")
                     if row.get("qr"):
-                        qr_bytes = bytes(row["qr"])
-                        st.image(qr_bytes, caption="QR del producto", width=150)
+                        try:
+                            qr_bytes = bytes(row["qr"])
+                            img = Image.open(io.BytesIO(qr_bytes))
+                            st.image(img, caption="QR del producto", width=150)
+                        except Exception:
+                            st.warning("QR inválido o no se pudo mostrar")
                     else:
                         st.warning("QR no disponible")
         else:
@@ -120,6 +124,10 @@ def display_cart():
     for idx, item in enumerate(carrito):
         st.write(f"{idx+1}. {item['nombre']} - ${item['venta']:.2f}")
     st.write(f"**Total:** ${total:.2f}")
+
+    if st.button("Cobrar"):
+        st.success(f"Compra realizada. Total pagado: ${total:.2f}")
+        st.session_state[CART_KEY] = []
 
 def escanear_qr_desde_imagen(img):
     detector = cv2.QRCodeDetector()
